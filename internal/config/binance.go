@@ -3,6 +3,9 @@ package config
 import (
 	"errors"
 	"os"
+
+	"github.com/ValeryCherneykin/binance-dca-bot/internal/logger"
+	"go.uber.org/zap"
 )
 
 const (
@@ -23,18 +26,22 @@ type binanceConfig struct {
 func NewBinanceConfig() (BinanceConfig, error) {
 	apiKey := os.Getenv(binanceAPIKey)
 	if len(apiKey) == 0 {
+		logger.Error("binance api key not found", zap.String("env_var", binanceAPIKey))
 		return nil, errors.New("binance api key not found")
 	}
 
 	secret := os.Getenv(binanceSecret)
 	if len(secret) == 0 {
-		return nil, errors.New("binance secret key not found")
+		logger.Error("binance secret not found", zap.String("env_var", binanceSecret))
+		return nil, errors.New("binance secret not found")
 	}
 
 	cfg := &binanceConfig{
 		apiKey: apiKey,
 		secret: secret,
 	}
+
+	logger.Info("binance config loaded")
 
 	return cfg, nil
 }
